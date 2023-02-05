@@ -1,8 +1,8 @@
 import discord
 import os
 from dotenv import load_dotenv
-import requests
-import json
+from commands.help import help
+from commands.show import send_profile_by_id
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -25,6 +25,7 @@ async def on_message(message):
 
     if content.startswith('prof'):
 
+        # 引数を分析するシステムはもう少し改良の余地あり
         subcommands = content.strip().split()[1:]
 
         if len(subcommands) == 0:
@@ -32,7 +33,7 @@ async def on_message(message):
             return
 
         if subcommands[0] == "help":
-            await show_help(message)
+            await help(message)
             return
 
         if subcommands[0] == "show":
@@ -46,15 +47,8 @@ async def on_message(message):
                     return
                 else:
                     user_id = subcommands[1]
-                    url = f"https://api.pjsekai.moe/api/user/{user_id}/profile"
-                    response = requests.get(url)
-                    data = json.loads(response.text)
-                    game_data = data['user']['userGamedata']
-                    result = (
-                        f"{game_data['name']} のプロフィール\n"
-                        f"ランク：{game_data['rank']}"
-                    )
-                    await message.channel.send(result)
+                    await send_profile_by_id(message, user_id)
+                    return
             except Exception as e:
                 await message.channel.send(e)
             return
@@ -63,19 +57,10 @@ async def on_message(message):
 async def describe(message):
     description = (
         "Hello, World!\n"
-        "`prof help`  コマンドの使い方を表示します。"
+        "`prof help`でコマンドの使い方を表示します。"
     )
     await message.channel.send(description)
 
-
-async def show_help(message):
-    description = (
-        "サブコマンド一覧\n"
-        "`help`  コマンドの使い方を表示します。\n"
-        "`show`  ユーザーのプロフィールを表示します。第二引数にユーザーidを入力します。"
-    )
-
-    await message.channel.send(description)
 
 load_dotenv()
 
