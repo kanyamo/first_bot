@@ -2,7 +2,11 @@
 ### クローン
 ```
 git clone https://github.com/kanyamo/first_bot.git
-cd first_bot
+cd first_bot 
+```
+### ブランチを分ける
+```
+git checkout -b ブランチ名
 ```
 ### 環境変数ファイルを作成する
 ```
