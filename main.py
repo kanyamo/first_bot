@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from commands.help import help
 from commands.show import send_profile_by_id
 
+# for test
+# from models.music import Music
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -61,6 +64,9 @@ async def describe(message):
     )
     await message.channel.send(description)
 
+# for test
+# music = Music.from_id(1)
+# print(music.difficulties)
 
 load_dotenv()
 
