@@ -2,20 +2,40 @@ import discord
 import os
 from dotenv import load_dotenv
 from commands.help import help
-from commands.show import send_profile_by_id
+from commands.show import get_profile_by_id
 
 # for test
 # from models.music import Music
+
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 client = discord.Client(intents=intents)
+tree = discord.app_commands.CommandTree(client)
+
+guild = discord.Object(id=int(os.getenv("GUILD_ID")))
+
+
+@tree.command(
+    name="profile",  # 入力するコマンド名
+    description="プロフィールを表示します。",  # コマンドの説明
+)
+@discord.app_commands.describe(
+    id="プロフィールを表示したいユーザーのidです。",  # コマンドの引数の説明
+)
+@discord.app_commands.guilds(guild)
+async def profile(ctx: discord.Interaction, id: str) -> None:
+    res = get_profile_by_id(id)
+    await ctx.response.send_message(res)
 
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+    await tree.sync(guild=guild)
+    print('Done!')
 
 
 @client.event
@@ -50,7 +70,7 @@ async def on_message(message):
                     return
                 else:
                     user_id = subcommands[1]
-                    await send_profile_by_id(message, user_id)
+                    await message.channel.send(get_profile_by_id(user_id))
                     return
             except Exception as e:
                 await message.channel.send(e)
@@ -67,8 +87,6 @@ async def describe(message):
 # for test
 # music = Music.from_id(1)
 # print(music.difficulties)
-
-load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
 
